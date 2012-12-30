@@ -10,6 +10,7 @@ logging
 wsgiref
 pytils
 django-debug-toolbar
+BeautifulSoup
 -e git+https://github.com/glader/easywebdav.git#egg=easywebdav
 -e git+https://github.com/glader/django_yafotki.git#egg=yafotki>=0.4
 -e git+https://github.com/glader/django_change_user#egg=change_user
