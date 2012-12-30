@@ -1,0 +1,15 @@
+Django==1.4.3
+MySQL-python
+PIL
+South
+boto
+django-messages
+django-ses
+flup
+logging
+wsgiref
+pytils
+django-debug-toolbar
+-e git+https://github.com/glader/easywebdav.git#egg=easywebdav
+-e git+https://github.com/glader/django_yafotki.git#egg=yafotki>=0.4
+-e git+https://github.com/glader/django_change_user#egg=change_user

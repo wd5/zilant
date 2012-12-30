@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo $(date) restarted >> /var/log/projects/zilant/restart.log
+exec chpst -u www /home/www/projects/zilant/ENV/bin/python /home/www/projects/zilant/src/manage.py runfcgi errlog=/var/log/projects/zilant/fcgi-error.log method=prefork socket=/home/www/projects/zilant/fcgi.sock pidfile=/home/www/projects/zilant/pid daemonize=false

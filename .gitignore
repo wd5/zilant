@@ -1,4 +1,8 @@
+.idea
 *.log
 *.pot
 *.pyc
+log
 local_settings.py
+fab_settings.py
+ENV
