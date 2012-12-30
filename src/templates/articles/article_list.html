@@ -1,0 +1,4 @@
+
+{% for article in articles %}
+    <a href="{% url article article.id %}" class="btn">{{ article.title }}</a>
+{% endfor %}

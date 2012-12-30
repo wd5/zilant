@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load articles %}
+
+{% block content %}
+    <h2>{{ object.title }}</h2>
+    {{ object.content|safe }}
+
+{% endblock %}
