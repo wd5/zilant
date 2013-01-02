@@ -19,18 +19,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls), name="admin"),
     (r'^articles', include('articles.urls')),
 
-    url('^roles$',  'core.views.roles', name='roles'),
-    url('^add_role', 'core.views.add_role', name="add_role"),
-    url('^choose_role', 'core.views.choose_role', name="choose_role"),
-    url('^form$', 'core.views.form', name="form"),
     url('^profile', 'core.views.profile', name="profile"),
-    url('^lock_role/(\d+)$', 'core.views.lock_role', name="lock_role"),
-
-    url('^groups/(?P<code>\w+)$', 'core.views.tradition_view', name="tradition"),
-    url('^groups/(?P<code>\w+)/add$', 'core.views.add_tradition_text', name="add_tradition_text"),
-    url('^groups/(?P<code>\w+)/add_file$', 'core.views.add_tradition_file', name="add_tradition_file"),
-    url('^groups/(?P<code>\w+)/(?P<number>\d+)$', 'core.views.tradition_text', name="tradition_text"),
-    url('^groups/(?P<code>\w+)/(?P<number>\d+)/edit$', 'core.views.edit_tradition_text', name="edit_tradition_text"),
 
     url('^$', direct_to_template, {'template': 'index.html'}),
 

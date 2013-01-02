@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
+from datetime import date
 
 from django.contrib.auth import authenticate
 from django.forms import *
+from django.db.models import Q
 
-from models import *
+from .models import *
 
 
 class CommonForm(Form):
@@ -16,48 +18,83 @@ class CommonForm(Form):
 
 
 class RegistrationForm(CommonForm):
-    login = CharField(label=u'Ник', max_length=100)
-    passwd = CharField(label=u'Пароль', max_length=100, widget=PasswordInput)
     email = EmailField(label=u'Email', max_length=100)
-    name = CharField(label=u'ФИО', max_length=100)
-    age = IntegerField(label=u'Возраст')
-    city = CharField(label=u'Город', max_length=100)
-    icq = IntegerField(label=u'ICQ', required=False)
-    tel = CharField(label=u'Телефон', max_length=100, required=False)
-    med = CharField(label=u'Мед. особенности', max_length=100, widget=Textarea, required=False)
-    portrait = ImageField(label=u'Фото', required=False)
+    passwd = CharField(label=u'Пароль', max_length=100, widget=PasswordInput)
+    passwd2 = CharField(label=u'Пароль еще раз', max_length=100, widget=PasswordInput)
 
-    def clean_login(self):
-        try:
-            User.objects.get(username=self.cleaned_data['login'])
-            raise ValidationError(u"Этот ник занят. Может, вы уже зарегистрированы на сайте?")
-        except User.DoesNotExist:
-            return self.cleaned_data['login']
+    def clean(self):
+        if self.cleaned_data.get('passwd') != self.cleaned_data.get('passwd2'):
+            raise ValidationError(u"Пароли должны быть одинаковыми.")
 
-    def clean_tel(self):
-        if self.cleaned_data.get('tel'):
-            tel = re.sub('[^0-9]', '', self.cleaned_data.get('tel'))
-            if len(tel) in (7, 11) and tel[0] in '2378':
-                return self.cleaned_data.get('tel')
-            else:
-                raise ValidationError(u"Номер телефона вызывает сомнение. Проверьте, правильно ли вы его ввели.")
+        return self.cleaned_data
 
     def save(self):
-        new_user = User.objects.create_user(self.cleaned_data['login'],
+        new_user = User.objects.create_user(
             self.cleaned_data['email'],
-            self.cleaned_data['passwd'])
+            self.cleaned_data['email'],
+            self.cleaned_data['passwd']
+        )
         new_user.is_active = True
         new_user.save()
 
-        profile = Profile.objects.create(
-            user=new_user,
-            name=self.cleaned_data['name'],
-            age=self.cleaned_data['age'],
-            city=self.cleaned_data['city'],
-            icq=self.cleaned_data['icq'],
-            tel=self.cleaned_data['tel'],
-            med=self.cleaned_data['med'],
-            portrait=self.cleaned_data['portrait'],
-        )
-
         return authenticate(username=new_user.username, password=self.cleaned_data['passwd'])
+
+
+class LoginForm(CommonForm):
+    login = CharField(label=u'Ник', max_length=100)
+    passwd = CharField(label=u'Пароль', max_length=100, widget=PasswordInput)
+    retpath = CharField(max_length=2000, required=False, widget=HiddenInput)
+
+    def get_user(self, s):
+        u""" Проверяет строку на емейл, логин или номер пользователя """
+        if s.isdigit():
+            return User.objects.get(id=s)
+        else:
+            return User.objects.get(Q(username=s) | Q(email=s))
+
+    def clean(self):
+        login = self.cleaned_data.get('login', '')
+        passwd = self.cleaned_data.get('passwd', '')
+
+        try:
+            user = self.get_user(login)
+        except User.DoesNotExist:
+            raise ValidationError(u'Логин или пароль не верен')
+
+        auth_user = authenticate(username=user.username, password=passwd)
+        if auth_user:
+            self.user = auth_user
+            return self.cleaned_data
+        else:
+            raise ValidationError(u'Логин или пароль не верен')
+
+
+class ProfileForm(ModelForm):
+    class Meta:
+        model = Profile
+        exclude = ['user']
+
+    family = CharField(max_length=200, label=u"Фамилия")
+    name = CharField(max_length=200, label=u"Имя")
+    patronymic = CharField(max_length=200, label=u"Отчество")
+    birth = DateField(label=u"Дата рождения", help_text=u"В виде ГГГГ-ММ-ДД")
+    country = CharField(max_length=200, label=u"Страна")
+    region = CharField(max_length=200, label=u"Область")
+    city = CharField(max_length=200, label=u"Город")
+    passport_number = CharField(max_length=200, label=u"Номер паспорта")
+    passport_date = DateField(label=u"Дата выдачи", help_text=u"В виде ГГГГ-ММ-ДД")
+    passport_given = CharField(max_length=200, label=u"Кем выдан")
+    med_doc = CharField(max_length=200, label=u"Номер полиса")
+    health = CharField(max_length=200, label=u"Состояние здоровья")
+
+    def clean(self):
+        if self.cleaned_data.get('birth'):
+            age = (date.today() - self.cleaned_data.get('birth')).days / 365
+
+            if age >= 18 and not self.cleaned_data.get('photo'):
+                raise ValidationError(u"Пожалуйста приложите свою фотографию")
+
+            if age < 18 and not self.cleaned_data.get('parent_profile'):
+                raise ValidationError(u"Пожалуйста укажите ответственного за вас")
+
+        return self.cleaned_data

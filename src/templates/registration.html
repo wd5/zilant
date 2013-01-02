@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Новая заявка</h1>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    {% if profile_form %}
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ registration_form }}
+            <h2>Обязательные данные</h2>
+            {{ profile_form }}
+
+            <input type="submit" value="Подать заявку">
+        </form>
+    {% endif %}
+
+{% endblock %}

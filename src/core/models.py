@@ -37,7 +37,7 @@ def sanitizeHTML(value, mode='none'):
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User, verbose_name=u'Пользователь', null=True, blank=True)
+    user = models.ForeignKey(User, verbose_name=u'Пользователь', null=True, blank=True, related_name='user')
     family = models.CharField(max_length=200, verbose_name=u"Фамилия", null=True, blank=True, default=None)
     name = models.CharField(max_length=200, verbose_name=u"Имя", null=True, blank=True, default=None)
     patronymic = models.CharField(max_length=200, verbose_name=u"Отчество", null=True, blank=True, default=None)
@@ -64,7 +64,7 @@ class Profile(models.Model):
 
     photo = YFField(verbose_name=u"Фото", upload_to='zilant', null=True, blank=True, default=None)
 
-    parent_profile = models.ForeignKey('self', verbose_name=u'Заявка ответственного', null=True, blank=True, default=None)
+    parent_profile = models.ForeignKey('self', verbose_name=u'Заявка ответственного', null=True, blank=True, default=None, related_name='parent')
 
     def __unicode__(self):
         return self.name or ""
@@ -90,7 +90,7 @@ class Profile(models.Model):
                     if getattr(self, field.name) != getattr(prev, field.name):
                         report += u"%s: '%s' -> '%s'\n" % (field.verbose_name, getattr(prev, field.name) or '-', getattr(self, field.name) or '-')
             else:
-                report = u"Новый игрок [%s]:\n" % self.user.pk
+                report = u"Новый посетитель [%s]:\n" % self.user.pk
                 for field in self._meta.fields:
                     if field.name in('paid', 'locked_fields'):
                         continue
@@ -100,7 +100,7 @@ class Profile(models.Model):
                 emails = [self.user.email]
 
                 send_mail(
-                    u"Зилант: профиль игрока %s" % self.name,
+                    u"Зилант: профиль посетителя %s" % self.name,
                     report,
                     None,
                     emails,
