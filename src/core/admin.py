@@ -16,3 +16,8 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile, ProfileAdmin)
+
+admin.site.register(EventPlace)
+admin.site.register(EventType)
+admin.site.register(EventBlock)
+admin.site.register(Event)

@@ -21,6 +21,9 @@ urlpatterns = patterns('',
 
     url('^profile', 'core.views.profile', name="profile"),
 
+    url('^events/add', 'core.views.add_event', name="add_event"),
+    url('^events/(?P<event_id>\d+)$', 'core.views.event', name="event"),
+
     url('^$', direct_to_template, {'template': 'index.html'}),
 
 )

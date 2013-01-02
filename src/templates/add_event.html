@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Новое мероприятие</h1>
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    {% if form %}
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+
+            <input type="submit" value="Добавить">
+        </form>
+    {% endif %}
+{% endblock %}

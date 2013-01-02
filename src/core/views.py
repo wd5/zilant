@@ -76,3 +76,21 @@ def profile(request):
         form = ProfileForm(instance=request.actual_profile)
 
     return render_to_response(request, 'profile.html', {'profile_form': form})
+
+
+@login_required
+def add_event(request):
+    if request.POST:
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(request.user)
+            return HttpResponseRedirect(reverse('event', args=[event.id]))
+    else:
+        form = EventForm()
+
+    return render_to_response(request, 'add_event.html', {'form': form})
+
+
+def event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    return render_to_response(request, 'event.html', {'event': event})

@@ -98,3 +98,16 @@ class ProfileForm(ModelForm):
                 raise ValidationError(u"Пожалуйста укажите ответственного за вас")
 
         return self.cleaned_data
+
+
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
+        exclude = ['author']
+
+    def save(self, user, *args, **kwargs):
+        event = super(EventForm, self).save(commit=False)
+
+        event.author = user
+        event.save()
+        return event

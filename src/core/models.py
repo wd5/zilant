@@ -111,3 +111,51 @@ class Profile(models.Model):
     class Meta:
         verbose_name = u"Заявка"
         verbose_name_plural = u"Заявки"
+
+
+class EventType(models.Model):
+    name = models.CharField(verbose_name=u"Название", max_length=100)
+
+    def __unicode__(self): return self.name
+
+    class Meta:
+        verbose_name = u"Формат"
+        verbose_name_plural = u"Форматы"
+
+
+class EventPlace(models.Model):
+    name = models.CharField(verbose_name=u"Название", max_length=100)
+
+    def __unicode__(self): return self.name
+
+    class Meta:
+        verbose_name = u"Площадка"
+        verbose_name_plural = u"Площадки"
+
+
+class EventBlock(models.Model):
+    name = models.CharField(verbose_name=u"Название", max_length=100)
+
+    def __unicode__(self): return self.name
+
+    class Meta:
+        verbose_name = u"Блок"
+        verbose_name_plural = u"Блоки"
+
+
+class Event(models.Model):
+    author = models.ForeignKey(User, verbose_name=u"Автор", related_name='author')
+    type = models.ForeignKey(EventType, verbose_name=u"Формат", related_name='type')
+    place = models.ForeignKey(EventPlace, verbose_name=u"Площадка", related_name='place')
+    block = models.ForeignKey(EventBlock, verbose_name=u"Блок", related_name='block')
+    name = models.CharField(verbose_name=u"Название", max_length=100)
+    description = models.TextField(verbose_name=u"Описание", help_text=u"не менее 150 символов")
+    additional = models.TextField(verbose_name=u"Доп. инфо", null=True, blank=True, default=None)
+    stuff = models.TextField(verbose_name=u"Ресурсы", null=True, blank=True, default=None)
+    dt = models.DateTimeField(verbose_name=u"Датавремя начала", help_text=u"В формате ГГГГ-ММ-ДД ЧЧ:ММ")
+
+    def __unicode__(self): return self.name
+
+    class Meta:
+        verbose_name = u"Мероприятие"
+        verbose_name_plural = u"Мероприятия"
