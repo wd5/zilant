@@ -10,7 +10,7 @@
     {% if profile_form %}
         <form method="POST" action="" enctype="multipart/form-data">
             {% csrf_token %}
-            <h2>Обязательные данные</h2>
+            <h2>Заявка</h2>
             {{ profile_form }}
 
             <input type="submit" value="Сохранить">
