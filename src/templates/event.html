@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Мероприятие "{{ event.name }}"</h1>
+    <h1>Мероприятие "{{ event.name }}" (<a href="{% url edit_event event.id %}">ред.</a>)</h1>
 
-    
+
 {% endblock %}

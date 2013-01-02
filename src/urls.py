@@ -23,6 +23,7 @@ urlpatterns = patterns('',
 
     url('^events/add', 'core.views.add_event', name="add_event"),
     url('^events/(?P<event_id>\d+)$', 'core.views.event', name="event"),
+    url('^events/(?P<event_id>\d+)/edit$', 'core.views.edit_event', name="edit_event"),
 
     url('^$', direct_to_template, {'template': 'index.html'}),
 

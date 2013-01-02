@@ -94,3 +94,16 @@ def add_event(request):
 def event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     return render_to_response(request, 'event.html', {'event': event})
+
+
+@login_required
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.POST:
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save(request.user)
+    else:
+        form = EventForm(instance=event)
+
+    return render_to_response(request, 'edit_event.html', {'form': form})
