@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-import re
 from datetime import date
 
 from django.contrib.auth import authenticate
-from django.forms import *
+from django import forms
 from django.db.models import Q
+from django.contrib.auth.models import User
 
-from .models import *
+from .models import Profile, Event, EventPrint
 
 
-class CommonForm(Form):
+class CommonForm(forms.Form):
     def errors_list(self):
         return [u"%s: %s" % (self.fields[_].label, message) for _, l in self.errors.items() for message in l]
 
@@ -18,13 +18,13 @@ class CommonForm(Form):
 
 
 class RegistrationForm(CommonForm):
-    email = EmailField(label=u'Email', max_length=100)
-    passwd = CharField(label=u'Пароль', max_length=100, widget=PasswordInput)
-    passwd2 = CharField(label=u'Пароль еще раз', max_length=100, widget=PasswordInput)
+    email = forms.EmailField(label=u'Email', max_length=100)
+    passwd = forms.CharField(label=u'Пароль', max_length=100, widget=forms.PasswordInput)
+    passwd2 = forms.CharField(label=u'Пароль еще раз', max_length=100, widget=forms.PasswordInput)
 
     def clean(self):
         if self.cleaned_data.get('passwd') != self.cleaned_data.get('passwd2'):
-            raise ValidationError(u"Пароли должны быть одинаковыми.")
+            raise forms.ValidationError(u"Пароли должны быть одинаковыми.")
 
         return self.cleaned_data
 
@@ -41,9 +41,9 @@ class RegistrationForm(CommonForm):
 
 
 class LoginForm(CommonForm):
-    login = CharField(label=u'Ник', max_length=100)
-    passwd = CharField(label=u'Пароль', max_length=100, widget=PasswordInput)
-    retpath = CharField(max_length=2000, required=False, widget=HiddenInput)
+    login = forms.CharField(label=u'Ник', max_length=100)
+    passwd = forms.CharField(label=u'Пароль', max_length=100, widget=forms.PasswordInput)
+    retpath = forms.CharField(max_length=2000, required=False, widget=forms.HiddenInput)
 
     def get_user(self, s):
         u""" Проверяет строку на емейл, логин или номер пользователя """
@@ -59,48 +59,48 @@ class LoginForm(CommonForm):
         try:
             user = self.get_user(login)
         except User.DoesNotExist:
-            raise ValidationError(u'Логин или пароль не верен')
+            raise forms.ValidationError(u'Логин или пароль не верен')
 
         auth_user = authenticate(username=user.username, password=passwd)
         if auth_user:
             self.user = auth_user
             return self.cleaned_data
         else:
-            raise ValidationError(u'Логин или пароль не верен')
+            raise forms.ValidationError(u'Логин или пароль не верен')
 
 
-class ProfileForm(ModelForm):
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         exclude = ['user']
 
-    family = CharField(max_length=200, label=u"Фамилия")
-    name = CharField(max_length=200, label=u"Имя")
-    patronymic = CharField(max_length=200, label=u"Отчество")
-    birth = DateField(label=u"Дата рождения", help_text=u"В виде ГГГГ-ММ-ДД")
-    country = CharField(max_length=200, label=u"Страна")
-    region = CharField(max_length=200, label=u"Область")
-    city = CharField(max_length=200, label=u"Город")
-    passport_number = CharField(max_length=200, label=u"Номер паспорта")
-    passport_date = DateField(label=u"Дата выдачи", help_text=u"В виде ГГГГ-ММ-ДД")
-    passport_given = CharField(max_length=200, label=u"Кем выдан")
-    med_doc = CharField(max_length=200, label=u"Номер полиса")
-    health = CharField(max_length=200, label=u"Состояние здоровья")
+    family = forms.CharField(max_length=200, label=u"Фамилия")
+    name = forms.CharField(max_length=200, label=u"Имя")
+    patronymic = forms.CharField(max_length=200, label=u"Отчество")
+    birth = forms.DateField(label=u"Дата рождения", help_text=u"В виде ГГГГ-ММ-ДД")
+    country = forms.CharField(max_length=200, label=u"Страна")
+    region = forms.CharField(max_length=200, label=u"Область")
+    city = forms.CharField(max_length=200, label=u"Город")
+    passport_number = forms.CharField(max_length=200, label=u"Номер паспорта")
+    passport_date = forms.DateField(label=u"Дата выдачи", help_text=u"В виде ГГГГ-ММ-ДД")
+    passport_given = forms.CharField(max_length=200, label=u"Кем выдан")
+    med_doc = forms.CharField(max_length=200, label=u"Номер полиса")
+    health = forms.CharField(max_length=200, label=u"Состояние здоровья")
 
     def clean(self):
         if self.cleaned_data.get('birth'):
             age = (date.today() - self.cleaned_data.get('birth')).days / 365
 
             if age >= 18 and not self.cleaned_data.get('photo'):
-                raise ValidationError(u"Пожалуйста приложите свою фотографию")
+                raise forms.ValidationError(u"Пожалуйста приложите свою фотографию")
 
             if age < 18 and not self.cleaned_data.get('parent_profile'):
-                raise ValidationError(u"Пожалуйста укажите ответственного за вас")
+                raise forms.ValidationError(u"Пожалуйста укажите ответственного за вас")
 
         return self.cleaned_data
 
 
-class EventForm(ModelForm):
+class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         exclude = ['author']
@@ -111,3 +111,6 @@ class EventForm(ModelForm):
         event.author = user
         event.save()
         return event
+
+
+PrintFormSet = forms.models.inlineformset_factory(Event, EventPrint, fk_name="event", can_delete=False, extra=1)

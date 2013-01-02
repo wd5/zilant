@@ -159,3 +159,23 @@ class Event(models.Model):
     class Meta:
         verbose_name = u"Мероприятие"
         verbose_name_plural = u"Мероприятия"
+
+
+class EventPrint(models.Model):
+    event = models.ForeignKey(Event, verbose_name=u"Мероприятие")
+    type = models.CharField(verbose_name=u"Формат", max_length=50)
+    amount = models.IntegerField(verbose_name=u"Количество")
+    content = models.TextField(verbose_name=u"Текст")
+    file1 = models.FileField(upload_to='print', verbose_name=u"Файл1", null=True, blank=True, default=None)
+    file2 = models.FileField(upload_to='print', verbose_name=u"Файл2", null=True, blank=True, default=None)
+    file3 = models.FileField(upload_to='print', verbose_name=u"Файл3", null=True, blank=True, default=None)
+    file4 = models.FileField(upload_to='print', verbose_name=u"Файл4", null=True, blank=True, default=None)
+    file5 = models.FileField(upload_to='print', verbose_name=u"Файл5", null=True, blank=True, default=None)
+    result = models.FileField(upload_to='print', verbose_name=u"Итог", null=True, blank=True, default=None)
+    is_ready = models.BooleanField(verbose_name=u"Принято", default=False)
+
+    def __unicode__(self): return self.event.name + u': ' + self.type
+
+    class Meta:
+        verbose_name = u"Полиграфия"
+        verbose_name_plural = u"Полиграфия"

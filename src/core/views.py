@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-import logging
-import random
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
-from .forms import *
-from .utils import render_to_response, make_pages
+from .forms import RegistrationForm, LoginForm, ProfileForm, EventForm, PrintFormSet
+from .utils import render_to_response
+from .models import Profile, Event
 
 
 def registration(request):
@@ -99,11 +98,21 @@ def event(request, event_id):
 @login_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+
     if request.POST:
         form = EventForm(request.POST, request.FILES, instance=event)
+        print_formset = PrintFormSet(request.POST, request.FILES, instance=event)
         if form.is_valid():
             form.save(request.user)
+
+        if print_formset.is_valid():
+            print_formset.save()
+
+        if form.is_valid() and print_formset.is_valid():
+            return HttpResponseRedirect(reverse('event', args=[event.id]) + '?save=ok')
+
     else:
         form = EventForm(instance=event)
+        print_formset = PrintFormSet(instance=event)
 
-    return render_to_response(request, 'edit_event.html', {'form': form})
+    return render_to_response(request, 'edit_event.html', {'form': form, 'print_formset': print_formset})

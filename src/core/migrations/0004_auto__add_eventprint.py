@@ -1,82 +1,35 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-
-        types = (
-            u"Семинар",
-            u"Лекция",
-            u"Концерт",
-            u"Шоу",
-            u"Театрализованное представление",
-            u"Танцевальное мероприятие",
-            u"Дискотека",
-            u"Турнир",
-            u"Другое",
-        )
-
-        for type in types:
-            orm.EventType.objects.create(name=type)
-
-        places = (
-            u"ДКЛ Площадь перед ДК",
-            u"ДКЛ БЗ",
-            u"ДКЛ Спортзал",
-            u"ДКЛ Кинозал",
-            u"ДКЛ Кинозал сцена",
-            u"ДКЛ Мраморный зал",
-            u"ДКЛ Майдан",
-            u"ДКЛ Хореография",
-            u"ДКЛ Хореография",
-            u"ДКЛ Стекляшка",
-            u"ДКЛ МЗ",
-            u"ДКЛ Хоровой класс",
-            u"ДКЛ Балкон",
-            u"ДКЛ Читальный зал",
-            u"ДКЛ Читальный зал (за ним)",
-            u"ДКЛ 401",
-            u"ДКЛ Фойе",
-            u"ДКЛ Буфет",
-            u"ДКЛ Заман 1",
-            u"ДКЛ Заман 2",
-            u"ДКЛ Заман 3",
-            u"ДКЛ Комната №9",
-            u"ДКЛ Потайная комната",
-            u"Школа 62, спортзал",
-            u"ДКГ АЗ",
-            u"ДКГ Зал 1",
-            u"ДКГ Зал 3",
-            u"ДКГ Подвал",
-            u"ДКГ Кабинет Б",
-            u"ДКГ Кабинет М",
-        )
-
-        for place in places:
-            orm.EventPlace.objects.create(name=place)
-
-        blocks = (
-            u"Интерактивный конвент",
-            u"Шоу-конвент",
-            u"Музыкальный конвент",
-            u"Глашатай",
-            u"Академия игр",
-            u"Меч дракона",
-            u"Сделай сам",
-        )
-
-        for block in blocks:
-            orm.EventBlock.objects.create(name=block)
+        # Adding model 'EventPrint'
+        db.create_table('core_eventprint', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('event', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Event'])),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('amount', self.gf('django.db.models.fields.IntegerField')()),
+            ('content', self.gf('django.db.models.fields.TextField')()),
+            ('file1', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('file2', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('file3', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('file4', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('file5', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('result', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('is_ready', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal('core', ['EventPrint'])
 
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        # Deleting model 'EventPrint'
+        db.delete_table('core_eventprint')
+
 
     models = {
         'auth.group': {
@@ -138,6 +91,21 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'core.eventprint': {
+            'Meta': {'object_name': 'EventPrint'},
+            'amount': ('django.db.models.fields.IntegerField', [], {}),
+            'content': ('django.db.models.fields.TextField', [], {}),
+            'event': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Event']"}),
+            'file1': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'file2': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'file3': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'file4': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'file5': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_ready': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'result': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
         'core.eventtype': {
             'Meta': {'object_name': 'EventType'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -172,4 +140,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['core']
-    symmetrical = True
